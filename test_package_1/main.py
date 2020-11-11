@@ -18,9 +18,6 @@ colGreen = "\u001B[32m"  # зеленый цвет символов в терм�
 colRed = "\u001B[31m"  # красный цвет символов в терминале
 colNo = "\u001B[0m"  # исходный цвет символов в терминале
 
-# инициализация массива пустыми значениями
-array_game = [[SYMBOL_EMPTY for column in range(number_column)] for line in range(number_line)]
-
 
 # функция печати массива
 def print_array(array_param):
@@ -90,19 +87,22 @@ def step_ai():
 # проверка горизонтали и вертикали
 def check_line(symbol):
     global array_game, number_line, number_column
+    if number_line == 1:
+        number_line = 1
+
     for line in range(number_line - 1):
         count_symbol_line = 0
         count_symbol_column = 0
         for position in range(number_column):
             if array_game[line][position] == symbol:  # подсчет по строкам
                 count_symbol_line += 1
-                if count_symbol_line == number_victory:
+                if count_symbol_line == number_victory:  # проверка победы
                     return True
             else:
                 count_symbol_line = 0
             if array_game[position][line] == symbol:  # подсчет по столбцам
                 count_symbol_column += 1
-                if count_symbol_column == number_victory:
+                if count_symbol_column == number_victory:  # проверка победы
                     return True
             else:
                 count_symbol_column = 0
@@ -125,13 +125,14 @@ def check_diagonal(symbol):
                 if position_x + position_z < number_line and position_y + position_z < number_column:
                     if array_game[position_x + position_z][position_y + position_z] == symbol:  # проверка 1 диагонали
                         count_symbol_diagonal_xy += 1
-                        if count_symbol_diagonal_xy == number_victory:
+                        if count_symbol_diagonal_xy == number_victory:  # проверка победы
                             return True
                     else:
                         count_symbol_diagonal_xy = 0
-                    if array_game[position_x + position_z][number_column - position_y - position_z - 1] == symbol:  # проверка 2 диагонали
+                    # проверка 2 диагонали
+                    if array_game[position_x + position_z][number_column - position_y - position_z - 1] == symbol:
                         count_symbol_diagonal_yx += 1
-                        if count_symbol_diagonal_yx == number_victory:
+                        if count_symbol_diagonal_yx == number_victory:  # проверка победы
                             return True
                     else:
                         count_symbol_diagonal_yx = 0
@@ -144,7 +145,7 @@ def check_victory(check_symbol):
     # проверка линии по горизонтали и вертикали
     if check_line(check_symbol):
         return True
-    # проверка диагонали - это надо дописать
+    # проверка диагонали
     if check_diagonal(check_symbol):
         return True
     return False
@@ -154,9 +155,25 @@ GAME_OVER = True  # признак окончания игры
 victory_human = False  # признак выигрыша человека
 victory_ai = False  # признак выигрыша машины
 game_over = False  # признак окончания игры (нет ходов)
-max_count_step = number_line * number_column  # максимальное количество ходов
 count_step = 0  # текущий ход
 
+# начало игры
+input_pole = input("Введите размер поля (количество строк количество столбцов) >>").split()
+if input_pole[0] == "q":  # если "q" то выходим из игры
+    exit()
+number_line = int(input_pole[0])
+number_column = int(input_pole[1])
+end_exit = True
+while end_exit:
+    number_victory = int(input("Введите количество элементов для выигрыша >>"))
+    if number_victory > number_line and number_victory > number_column:
+        print("Значение не может быть больше размера одной из сторон поля.")
+    else:
+        end_exit = False
+print(number_victory)
+# инициализация массива пустыми значениями
+array_game = [[SYMBOL_EMPTY for column in range(number_column)] for line in range(number_line)]
+max_count_step = number_line * number_column  # максимальное количество ходов
 print_array(array_game)  # печать текущего поля
 while GAME_OVER:  # играем до победы или окончания ходов
     if step_human():  # ход человека
