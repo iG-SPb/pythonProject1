@@ -1,12 +1,8 @@
 import random
 
-# размер игрового поля
-number_line = 3  # количество строк
-number_column = 3  # количество столбцов
 SYMBOL_HUMAN = "X"  # символ, которым играет человек
 SYMBOL_AI = "S"  # символ, которым играет искусственный интеллект
 SYMBOL_EMPTY = " "  # символ пустой ячейки
-number_victory = 3  # количество символов для победы
 EXIT_GAME = False  # признак окончания игры человеком
 # координаты последнего хода человека
 pos_x_human = 0
@@ -17,9 +13,6 @@ generate_y = 0
 colGreen = "\u001B[32m"  # зеленый цвет символов в терминале
 colRed = "\u001B[31m"  # красный цвет символов в терминале
 colNo = "\u001B[0m"  # исходный цвет символов в терминале
-
-# инициализация массива пустыми значениями
-array_game = [[SYMBOL_EMPTY for column in range(number_column)] for line in range(number_line)]
 
 
 # функция печати массива
@@ -90,57 +83,60 @@ def step_ai():
 # проверка горизонтали и вертикали
 def check_line(symbol):
     global array_game, number_line, number_column
-    print("symbol-", symbol)
-    for line in range(number_line - 1):
+    for line in range(number_line):
         count_symbol_line = 0
-        count_symbol_column = 0
         for position in range(number_column):
             if array_game[line][position] == symbol:  # подсчет по строкам
                 count_symbol_line += 1
-                print(99, line, position, count_symbol_line)
                 if count_symbol_line == number_victory:
-                    print("line")
                     return True
             else:
                 count_symbol_line = 0
-                print(90, line, position, count_symbol_line)
-            if array_game[position][line] == symbol:  # подсчет по столбцам
+    for column in range(number_column):
+        count_symbol_column = 0
+        for line in range(number_line):
+            if array_game[line][column] == symbol:  # подсчет по столбцам
                 count_symbol_column += 1
-                print(33, line, position, count_symbol_column)
                 if count_symbol_column == number_victory:
-                    print("column")
                     return True
             else:
                 count_symbol_column = 0
-                print(30, line, position, count_symbol_column)
     return False
 
 
 # проверка диагоналей
 def check_diagonal(symbol):
-    global array_game, number_line, number_column
-    for line in range(number_line - 1):
-        print("line-", end="")
-        print(line)
+    global array_game, number_line, number_column, number_victory
+    print("Symbol-", symbol)
+    count_symbol_diagonal_xy = 0
+    count_symbol_diagonal_yx = 0
+    for offset in range(number_column - number_victory):
+        for position in range(number_column):
+            if position == number_line:
+                break
+            else:
+                if array_game[position][offset + position] == symbol:
+                    count_symbol_diagonal_xy += 1
+                    if count_symbol_diagonal_xy == number_victory:
+                        return True
+                else:
+                    count_symbol_diagonal_xy = 0
+            #print("offset-", offset, position, offset + position, array_game[position][offset + position])
+            #print(count_symbol_diagonal_xy)
+    for line in range(1, number_line - number_victory + 1):
         count_symbol_diagonal_xy = 0
-        count_symbol_diagonal_yx = 0
-        for position in range(line, number_column):
-            print(555555, line+position, position)
-            # print(777777, line + number_column - position,  - line - 1)
-            #if array_game[position][position - line] == symbol:
-            #    count_symbol_diagonal_xy += 1
-            #    if count_symbol_diagonal_xy == number_victory:
-            #        print("diagonal_xy")
-            #        return True
-            #else:
-            #    count_symbol_diagonal_xy = 0
-            #if array_game[line][number_column - position - line] == symbol:
-            #    count_symbol_diagonal_yx += 1
-            #    if count_symbol_diagonal_yx == number_victory:
-            #        print("diagonal_yx")
-            #        return True
-            #else:
-            #    count_symbol_diagonal_yx = 0
+        for position in range(number_column):
+            if position == (number_line - 1):
+                break
+            else:
+                if array_game[line + position][position] == symbol:
+                    count_symbol_diagonal_xy += 1
+                    if count_symbol_diagonal_xy == number_victory:
+                        return True
+                else:
+                    count_symbol_diagonal_xy = 0
+            #print(555, line + position, position, array_game[line + position][position])
+            #print(count_symbol_diagonal_xy)
     return False
 
 
@@ -160,10 +156,29 @@ GAME_OVER = True  # признак окончания игры
 victory_human = False  # признак выигрыша человека
 victory_ai = False  # признак выигрыша машины
 game_over = False  # признак окончания игры (нет ходов)
+
+number_line = int(input("Введите количество строк: >>"))
+number_column = int(input("Введите количество столбцов: >>"))
+number_victory = 0  # количество символов для победы
+end_count_win = True
+while end_count_win:
+    number_victory = int(input("Введите значение количества символов для победы: >>"))
+    if number_victory > number_column and number_victory > number_line:
+        print(colRed, end="")
+        print("Число может быть меньше или равно числу строк (столбцов)")
+        print(colNo)
+    elif number_victory < 2:
+        print(colRed, end="")
+        print("Это значение принесет победу первому походившему игроку")
+        print(colNo)
+    else:
+        end_count_win = False
+
+# инициализация массива пустыми значениями
+array_game = [[SYMBOL_EMPTY for column in range(number_column)] for line in range(number_line)]
+print_array(array_game)  # печать текущего поля
 max_count_step = number_line * number_column  # максимальное количество ходов
 count_step = 0  # текущий ход
-
-print_array(array_game)  # печать текущего поля
 while GAME_OVER:  # играем до победы или окончания ходов
     if step_human():  # ход человека
         print("Выход из игры")
@@ -179,7 +194,6 @@ while GAME_OVER:  # играем до победы или окончания х�
         break
     step_ai()  # ход машины
     count_step += 1  # увеличение счетчика текущего хода
-    print("step AI")
     if check_victory(SYMBOL_AI):  # проверка победы машины
         print_array(array_game)  # печать текущего поля
         print("AI victory")
