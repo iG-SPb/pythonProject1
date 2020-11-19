@@ -83,18 +83,18 @@ def step_ai():
 # проверка горизонтали и вертикали
 def check_line(symbol):
     global array_game, number_line, number_column
-    for line in range(number_line):
+    for line in range(number_line):  # идем по строкам
         count_symbol_line = 0
-        for position in range(number_column):
+        for position in range(number_column):  # идем по элементам строки
             if array_game[line][position] == symbol:  # подсчет по строкам
                 count_symbol_line += 1
                 if count_symbol_line == number_victory:
                     return True
             else:
                 count_symbol_line = 0
-    for column in range(number_column):
+    for column in range(number_column):  # идем по столбцам
         count_symbol_column = 0
-        for line in range(number_line):
+        for line in range(number_line):  # идем по элементам столбца
             if array_game[line][column] == symbol:  # подсчет по столбцам
                 count_symbol_column += 1
                 if count_symbol_column == number_victory:
@@ -107,24 +107,30 @@ def check_line(symbol):
 # проверка диагоналей
 def check_diagonal(symbol):
     global array_game, number_line, number_column, number_victory
-    print("Symbol-", symbol)
     count_symbol_diagonal_xy = 0
     count_symbol_diagonal_yx = 0
-    for offset in range(number_column - number_victory):
-        for position in range(number_column):
-            if position == number_line:
+    for offset in range(number_column - number_victory):  # смещение вправо по массиву
+        for position in range(number_column):  # идем по диагонали
+            if position == number_line:  # выход если дошли до последней строки
                 break
             else:
-                if array_game[position][offset + position] == symbol:
+                if array_game[position][offset + position] == symbol:  # проверка диагонали
                     count_symbol_diagonal_xy += 1
                     if count_symbol_diagonal_xy == number_victory:
                         return True
                 else:
                     count_symbol_diagonal_xy = 0
-            #print("offset-", offset, position, offset + position, array_game[position][offset + position])
-            #print(count_symbol_diagonal_xy)
+                # проверка обратной диагонали
+                if array_game[position][number_column - position - offset - 1] == symbol:
+                    count_symbol_diagonal_yx += 1
+                    if count_symbol_diagonal_yx == number_victory:
+                        return True
+                else:
+                    count_symbol_diagonal_yx = 0
+    # проверяем остатки массива по углам
     for line in range(1, number_line - number_victory + 1):
         count_symbol_diagonal_xy = 0
+        count_symbol_diagonal_yx = 0
         for position in range(number_column):
             if position == (number_line - 1):
                 break
@@ -135,8 +141,12 @@ def check_diagonal(symbol):
                         return True
                 else:
                     count_symbol_diagonal_xy = 0
-            #print(555, line + position, position, array_game[line + position][position])
-            #print(count_symbol_diagonal_xy)
+                if array_game[line + position][number_column - position - 1] == symbol:
+                    count_symbol_diagonal_yx += 1
+                    if count_symbol_diagonal_yx == number_victory:
+                        return True
+                else:
+                    count_symbol_diagonal_yx = 0
     return False
 
 
