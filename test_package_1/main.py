@@ -111,7 +111,7 @@ def check_diagonal(symbol):
     count_symbol_diagonal_yx = 0
     for offset in range(number_column - number_victory):  # смещение вправо по массиву
         for position in range(number_column):  # идем по диагонали
-            if position == number_line:  # выход если дошли до последней строки
+            if position == number_line or (offset + position) == number_column:  # выход если дошли до последней строки
                 break
             else:
                 if array_game[position][offset + position] == symbol:  # проверка диагонали
@@ -132,9 +132,10 @@ def check_diagonal(symbol):
         count_symbol_diagonal_xy = 0
         count_symbol_diagonal_yx = 0
         for position in range(number_column):
-            if position == (number_line - 1):
+            if position == (number_line - 1) or (line + position) == number_line:
                 break
             else:
+                print(line + position, position)
                 if array_game[line + position][position] == symbol:
                     count_symbol_diagonal_xy += 1
                     if count_symbol_diagonal_xy == number_victory:
